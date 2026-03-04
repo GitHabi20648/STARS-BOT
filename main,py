@@ -1,8 +1,11 @@
 # Import required libraries
 import telebot 
 from telebot import types  
+import os
+import random
+import requests
 
-bot = telebot.TeleBot('')
+bot = telebot.TeleBot('8198025443:AAEVhq4EpwfskrUUR-j5n1T5QHYFsd7VkbY')
 
 # Product prices in stars
 PRICES = {
@@ -61,4 +64,25 @@ def handle_successful_payment(message):
     product = message.successful_payment.invoice_payload
     bot.reply_to(message, 
                  f"Payment for {product} successful!")
+    
+@bot.message_handler(commands=['mem'])
+def send_mem(message):
+    m = os.listdir('images')
+    with open(f'images/{random.choice(m)}', 'rb') as f:  
+        bot.send_photo(message.chat.id, f)
+
+def get_duck_image_url():    
+        url = 'https://random-d.uk/api/random'
+        res = requests.get(url)
+        data = res.json()
+        return data['url']
+    
+    
+@bot.message_handler(commands=['duck'])
+def duck(message):
+    '''По команде duck вызывает функцию get_duck_image_url и отправляет URL изображения утки'''
+    image_url = get_duck_image_url()
+    bot.reply_to(message, image_url)
+    
+
 bot.polling()
